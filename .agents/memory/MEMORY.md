@@ -1,0 +1,1 @@
+- [Astralis workspace quirks](astralis-quirks.md) — sharp edges for this project: workspace deps, solana tsconfig, Character type bridge, design subagent import pitfalls

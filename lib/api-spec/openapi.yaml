@@ -3,20 +3,33 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Astralis RPG API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: stats
+    description: Game statistics
+  - name: leaderboard
+    description: Player rankings
+  - name: activity
+    description: Recent game activity
+  - name: market
+    description: Marketplace listings
+  - name: burns
+    description: Token burn reports
+  - name: guilds
+    description: Guild information
+  - name: players
+    description: Player data
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +37,183 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /stats:
+    get:
+      operationId: getGameStats
+      tags: [stats]
+      summary: Get overall game statistics
+      responses:
+        "200":
+          description: Game stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameStats"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get top players
+      parameters:
+        - name: by
+          in: query
+          schema:
+            type: string
+            enum: [level, magic_balance, pvp_wins]
+            default: level
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+
+  /activity:
+    get:
+      operationId: getActivity
+      tags: [activity]
+      summary: Get recent game activity
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityResponse"
+
+  /market:
+    get:
+      operationId: getMarketListings
+      tags: [market]
+      summary: Get active market listings
+      parameters:
+        - name: rarity
+          in: query
+          schema:
+            type: string
+        - name: item_type
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Market listings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketResponse"
+
+  /burns:
+    get:
+      operationId: getBurnReport
+      tags: [burns]
+      summary: Get token burn report
+      responses:
+        "200":
+          description: Burn report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BurnReport"
+
+  /burns/recent:
+    get:
+      operationId: getRecentBurns
+      tags: [burns]
+      summary: Get recent burn transactions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Recent burns
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecentBurnsResponse"
+
+  /guilds:
+    get:
+      operationId: getGuilds
+      tags: [guilds]
+      summary: Get all guilds
+      responses:
+        "200":
+          description: Guild list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuildsResponse"
+
+  /guilds/{id}:
+    get:
+      operationId: getGuild
+      tags: [guilds]
+      summary: Get guild by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Guild details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuildDetail"
+        "404":
+          description: Not found
+
+  /players/{userId}:
+    get:
+      operationId: getPlayer
+      tags: [players]
+      summary: Get player profile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Player profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerProfile"
+        "404":
+          description: Not found
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +221,376 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    GameStats:
+      type: object
+      properties:
+        total_players:
+          type: integer
+        total_missions_completed:
+          type: integer
+        total_magic_burned:
+          type: integer
+        total_pvp_battles:
+          type: integer
+        total_guilds:
+          type: integer
+        total_market_volume:
+          type: integer
+        active_missions:
+          type: integer
+        rewards_pool:
+          type: integer
+      required:
+        - total_players
+        - total_missions_completed
+        - total_magic_burned
+        - total_pvp_battles
+        - total_guilds
+        - total_market_volume
+        - active_missions
+        - rewards_pool
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        user_id:
+          type: integer
+        username:
+          type: string
+        class:
+          type: string
+        level:
+          type: integer
+        xp:
+          type: integer
+        magic_balance:
+          type: integer
+        pvp_wins:
+          type: integer
+        pvp_losses:
+          type: integer
+        player_rank:
+          type: string
+      required:
+        - rank
+        - user_id
+        - username
+        - class
+        - level
+        - xp
+        - magic_balance
+        - pvp_wins
+        - pvp_losses
+        - player_rank
+
+    LeaderboardResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+        by:
+          type: string
+      required: [entries, by]
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [pvp, burn, mission, guild_raid]
+        description:
+          type: string
+        timestamp:
+          type: string
+        magic_amount:
+          type: integer
+          nullable: true
+      required: [id, type, description, timestamp]
+
+    ActivityResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+      required: [items]
+
+    MarketItem:
+      type: object
+      properties:
+        listing_id:
+          type: integer
+        item_id:
+          type: integer
+        item_name:
+          type: string
+        item_type:
+          type: string
+        rarity:
+          type: string
+        stat_type:
+          type: string
+        stat_value:
+          type: integer
+        emoji:
+          type: string
+        level:
+          type: integer
+        price:
+          type: integer
+        seller_id:
+          type: integer
+        seller_username:
+          type: string
+        listed_at:
+          type: string
+      required:
+        - listing_id
+        - item_id
+        - item_name
+        - item_type
+        - rarity
+        - stat_type
+        - stat_value
+        - emoji
+        - level
+        - price
+        - seller_id
+        - seller_username
+        - listed_at
+
+    MarketResponse:
+      type: object
+      properties:
+        listings:
+          type: array
+          items:
+            $ref: "#/components/schemas/MarketItem"
+        total:
+          type: integer
+      required: [listings, total]
+
+    BurnReport:
+      type: object
+      properties:
+        total_burned:
+          type: integer
+        total_to_marketing:
+          type: integer
+        total_to_buyback:
+          type: integer
+        total_to_rewards:
+          type: integer
+        burn_count:
+          type: integer
+        last_burn_at:
+          type: string
+          nullable: true
+      required:
+        - total_burned
+        - total_to_marketing
+        - total_to_buyback
+        - total_to_rewards
+        - burn_count
+
+    RecentBurn:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        username:
+          type: string
+        total_amount:
+          type: integer
+        burned:
+          type: integer
+        tx_signature:
+          type: string
+        burned_at:
+          type: string
+      required:
+        - id
+        - user_id
+        - username
+        - total_amount
+        - burned
+        - tx_signature
+        - burned_at
+
+    RecentBurnsResponse:
+      type: object
+      properties:
+        burns:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecentBurn"
+      required: [burns]
+
+    GuildSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        leader_id:
+          type: integer
+        leader_username:
+          type: string
+        level:
+          type: integer
+        xp:
+          type: integer
+        member_count:
+          type: integer
+        raid_boss:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+      required:
+        - id
+        - name
+        - leader_id
+        - leader_username
+        - level
+        - xp
+        - member_count
+        - created_at
+
+    GuildsResponse:
+      type: object
+      properties:
+        guilds:
+          type: array
+          items:
+            $ref: "#/components/schemas/GuildSummary"
+      required: [guilds]
+
+    GuildMember:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        class:
+          type: string
+        level:
+          type: integer
+        player_rank:
+          type: string
+      required: [user_id, username, class, level, player_rank]
+
+    GuildDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        leader_id:
+          type: integer
+        leader_username:
+          type: string
+        level:
+          type: integer
+        xp:
+          type: integer
+        raid_boss:
+          type: string
+          nullable: true
+        raid_hp:
+          type: integer
+        raid_max_hp:
+          type: integer
+        created_at:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/GuildMember"
+      required:
+        - id
+        - name
+        - leader_id
+        - leader_username
+        - level
+        - xp
+        - raid_hp
+        - raid_max_hp
+        - created_at
+        - members
+
+    PlayerProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        class:
+          type: string
+        player_rank:
+          type: string
+        level:
+          type: integer
+        xp:
+          type: integer
+        hp:
+          type: integer
+        max_hp:
+          type: integer
+        attack:
+          type: integer
+        defense:
+          type: integer
+        magic:
+          type: integer
+        speed:
+          type: integer
+        crit:
+          type: integer
+        magic_balance:
+          type: integer
+        pvp_wins:
+          type: integer
+        pvp_losses:
+          type: integer
+        guild_id:
+          type: integer
+          nullable: true
+        guild_name:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+      required:
+        - user_id
+        - username
+        - class
+        - player_rank
+        - level
+        - xp
+        - hp
+        - max_hp
+        - attack
+        - defense
+        - magic
+        - speed
+        - crit
+        - magic_balance
+        - pvp_wins
+        - pvp_losses
+        - created_at
