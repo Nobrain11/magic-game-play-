@@ -22,6 +22,9 @@ async function buildAll() {
     outdir: distDir,
     outExtension: { ".js": ".mjs" },
     logLevel: "info",
+    // Preserve class/function names — required for packages that do `constructor.name` checks
+    // (e.g. node-fetch@2 checks `proto.constructor.name === 'AbortSignal'`)
+    keepNames: true,
     // Some packages may not be bundleable, so we externalize them, we can add more here as needed.
     // Some of the packages below may not be imported or installed, but we're adding them in case they are in the future.
     // Examples of unbundleable packages:
