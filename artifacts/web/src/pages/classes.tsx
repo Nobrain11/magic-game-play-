@@ -3,7 +3,8 @@ import { Sparkles } from "lucide-react";
 
 import imgArcher from "@assets/IMG_2766_1780157984425.jpeg";
 import imgMage from "@assets/IMG_2765_1780157984425.jpeg";
-import imgChronofemale from "@assets/IMG_2760_1780157984425.jpeg";
+import imgChrono from "@assets/IMG_2772_1780162088601.jpeg";
+import imgRogue from "@assets/IMG_2769_1780162088601.jpeg";
 import imgDraconid from "@assets/IMG_2763_1780157984425.jpeg";
 import imgCrystalforged from "@assets/IMG_2762_1780157984425.jpeg";
 
@@ -131,6 +132,7 @@ const CLASSES: ClassDef[] = [
     lore: "Born from the void between stars, the Shadow Rogue strikes where it hurts most.",
     tags: ["Stealth", "Speed", "Poison", "Shadow Magic", "Critical Strike"],
     gradient: "linear-gradient(135deg, #1a0533 0%, #080010 100%)",
+    image: imgRogue,
     stats: { hp: 90, attack: 16, defense: 5, magic: 8, speed: 22 },
     abilities: [
       { name: "Shadow Strike", desc: "Strike from the shadows for 400% weapon damage. Always crits from stealth." },
@@ -148,7 +150,7 @@ const CLASSES: ClassDef[] = [
     lore: "She heals not just wounds — she rewrites the moments that created them. The Chronomancer is not a fighter at the front, but the still hands behind the victory.",
     tags: ["Time Magic", "Control", "Temporal Shift", "Haste", "Rewind"],
     gradient: "linear-gradient(135deg, #0c4a6e 0%, #01111e 100%)",
-    image: imgChronofemale,
+    image: imgChrono,
     stats: { hp: 105, attack: 6, defense: 9, magic: 20, speed: 13 },
     abilities: [
       { name: "Rewind", desc: "Turn back time for a target, restoring health and mana over the last few seconds." },
