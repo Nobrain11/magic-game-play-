@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
 
+import imgArcher from "@assets/IMG_2766_1780157984425.jpeg";
+import imgMage from "@assets/IMG_2765_1780157984425.jpeg";
+import imgChronofemale from "@assets/IMG_2760_1780157984425.jpeg";
+import imgDraconid from "@assets/IMG_2763_1780157984425.jpeg";
+import imgCrystalforged from "@assets/IMG_2762_1780157984425.jpeg";
+
 type ClassKey =
   | "warrior"
   | "archer"
@@ -22,6 +28,7 @@ type ClassDef = {
   lore: string;
   tags: string[];
   gradient: string;
+  image?: string;
   stats: { hp: number; attack: number; defense: number; magic: number; speed: number };
   abilities: { name: string; desc: string }[];
 };
@@ -51,14 +58,15 @@ const CLASSES: ClassDef[] = [
     rank: "D",
     archetype: "RANGER / BURST DPS",
     desc: "Ranged precision. High Speed & Crit.",
-    lore: "Swift and deadly, the Archer strikes from the shadows before the enemy knows they are there.",
+    lore: "Born under the crystalline spires of Astralis, Crystal Archers are honed from childhood in the art of the bow and the flow of mana. No target escapes their sight.",
     tags: ["Precision", "Speed", "Ranged", "Critical Strike", "Evasion"],
     gradient: "linear-gradient(135deg, #14532d 0%, #0a1a0f 100%)",
+    image: imgArcher,
     stats: { hp: 95, attack: 14, defense: 6, magic: 5, speed: 18 },
     abilities: [
-      { name: "Precise Shot", desc: "A perfectly aimed shot that always lands a critical hit." },
-      { name: "Rain of Arrows", desc: "Fire a volley of arrows in a wide area, hitting multiple targets." },
-      { name: "Evasive Roll", desc: "Quickly roll to dodge incoming attacks, gaining brief invincibility." },
+      { name: "Crystal Arrow", desc: "Fire a precision crystal arrow that pierces through enemies, dealing massive damage and ignoring a portion of their defense." },
+      { name: "Shard Volley", desc: "Release a volley of crystal arrows in a cone, striking multiple enemies and inflicting crystal bleed." },
+      { name: "Phantom Step", desc: "Dash backward in a blur of crystal light, becoming untargetable for a brief moment and gaining increased movement speed." },
     ],
   },
   {
@@ -68,14 +76,15 @@ const CLASSES: ClassDef[] = [
     rank: "C",
     archetype: "MAGE / BURST DPS",
     desc: "Burst damage specialist. High Magic.",
-    lore: "Channeling arcane energies beyond mortal comprehension, the Mage reshapes reality itself.",
+    lore: "Chosen by the Council at a young age and trained in the Sanctums of Astralis to channel pure mana and protect the balance of the realm.",
     tags: ["Arcane Power", "Burst Damage", "Spellcasting", "Area of Effect", "Intelligence"],
     gradient: "linear-gradient(135deg, #3b0764 0%, #0f0320 100%)",
+    image: imgMage,
     stats: { hp: 80, attack: 8, defense: 4, magic: 22, speed: 12 },
     abilities: [
-      { name: "Fireball", desc: "Hurl an explosive ball of fire dealing 300% magic damage in an area." },
-      { name: "Arcane Surge", desc: "Temporarily boost your magic power by 50% for 4 seconds." },
-      { name: "Blink", desc: "Teleport instantly to a targeted location, leaving a decoy behind." },
+      { name: "Arcane Bolt", desc: "Launch a bolt of pure arcane energy that pierces through enemies." },
+      { name: "Mana Surge", desc: "Increase your magic power, amplifying damage for a short duration." },
+      { name: "Reality Bend", desc: "Distort the fabric of reality, knocking enemies up and stunning them." },
     ],
   },
   {
@@ -136,14 +145,15 @@ const CLASSES: ClassDef[] = [
     rank: "B",
     archetype: "MAGE / CONTROLLER",
     desc: "Bends time itself. Heals & controls the field.",
-    lore: "Time is a river. The Chronomancer is the dam.",
+    lore: "She heals not just wounds — she rewrites the moments that created them. The Chronomancer is not a fighter at the front, but the still hands behind the victory.",
     tags: ["Time Magic", "Control", "Temporal Shift", "Haste", "Rewind"],
     gradient: "linear-gradient(135deg, #0c4a6e 0%, #01111e 100%)",
+    image: imgChronofemale,
     stats: { hp: 105, attack: 6, defense: 9, magic: 20, speed: 13 },
     abilities: [
-      { name: "Time Stop", desc: "Freeze all enemies in place for 2 seconds — time itself obeys you." },
-      { name: "Rewind", desc: "Reverse your position in time, healing to your HP from 3 seconds ago." },
-      { name: "Haste", desc: "Accelerate your actions, granting +100% Speed and double attacks." },
+      { name: "Rewind", desc: "Turn back time for a target, restoring health and mana over the last few seconds." },
+      { name: "Time Shield", desc: "Create a shield field that protects allies from damage and reverses negative effects for a short time." },
+      { name: "Age Reversal", desc: "Reverse the aging process of an ally, healing them greatly over time and removing negative effects." },
     ],
   },
   {
@@ -153,14 +163,15 @@ const CLASSES: ClassDef[] = [
     rank: "A",
     archetype: "WARRIOR / DESTROYER",
     desc: "Born of Dragons. Devastating power & presence.",
-    lore: "Half dragon, half warrior, entirely unstoppable. The Draconid Warlord commands fear from birth.",
+    lore: "Forged in the ancient fires of Astralis, the Draconids are the last descendants of celestial dragons. Their blood carries the echo of destruction and destiny. Born not to protect, but to conquer.",
     tags: ["Dragon Fire", "Draconic Power", "Terror", "Scales", "Dominance"],
     gradient: "linear-gradient(135deg, #7c2d12 0%, #200800 100%)",
+    image: imgDraconid,
     stats: { hp: 160, attack: 22, defense: 12, magic: 5, speed: 10 },
     abilities: [
-      { name: "Dragon Breath", desc: "Exhale a cone of dragonfire, burning all enemies for massive damage." },
-      { name: "Dragon Scales", desc: "Manifest draconic armor, adding 40% physical resistance." },
-      { name: "Draconic Roar", desc: "Let out a terrifying roar, reducing all enemy attack by 30%." },
+      { name: "Dragon Claw", desc: "Unleash a series of devastating slashes, leaving claw marks that bleed the enemy." },
+      { name: "Skybreaker Leap", desc: "Leap into the air and crash down with immense force, stunning enemies in an area." },
+      { name: "Dragon Ascension", desc: "Awaken your draconic power, increasing all stats and transforming into true draconic might." },
     ],
   },
   {
@@ -170,14 +181,15 @@ const CLASSES: ClassDef[] = [
     rank: "S",
     archetype: "TANK / COLOSSUS",
     desc: "Living crystal construct. Truly unbreakable.",
-    lore: "Created in the heart of a dying star, the Crystalforged is the pinnacle of magical engineering.",
+    lore: "Crystalforged are born from the heart of Astralis, where ancient magic and molten crystal merge. Forged to be unbreakable, they stand as eternal guardians of the city and its people.",
     tags: ["Crystal Armor", "Colossus", "Shard Magic", "Immunity", "Crystallize"],
     gradient: "linear-gradient(135deg, #164e63 0%, #010f14 100%)",
+    image: imgCrystalforged,
     stats: { hp: 220, attack: 12, defense: 25, magic: 3, speed: 4 },
     abilities: [
-      { name: "Crystal Barrier", desc: "Erect a crystalline shield that absorbs 500% of your Defense." },
-      { name: "Shard Burst", desc: "Explode crystal shards in all directions, hitting every nearby enemy." },
-      { name: "Crystallize", desc: "Encase an enemy in crystal, rooting them in place for 4 seconds." },
+      { name: "Crystal Slam", desc: "Slam the ground with tremendous force, shattering enemies and causing AOE crystal damage." },
+      { name: "Crystal Wall", desc: "Erect a barrier of solidified crystal that blocks damage and protects allies behind it." },
+      { name: "Shatter Core", desc: "Release stored energy from within, stunning enemies and dealing massive magic damage in a wide radius." },
     ],
   },
 ];
@@ -224,7 +236,7 @@ const StatBar = ({ label, value, max }: { label: string; value: number; max: num
 };
 
 export const Classes = () => {
-  const [selected, setSelected] = useState<ClassKey>("rogue");
+  const [selected, setSelected] = useState<ClassKey>("draconid");
   const cls = CLASSES.find((c) => c.key === selected) ?? CLASSES[0];
 
   return (
@@ -267,21 +279,46 @@ export const Classes = () => {
             className="rounded-lg overflow-hidden"
             style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
           >
-            <div
-              className="h-40 flex items-end p-5"
-              style={{ background: cls.gradient }}
-            >
-              <div>
-                <div className="text-4xl mb-2">{cls.emoji}</div>
-                <div className="text-2xl font-bold text-white">{cls.label}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <RankBadge rank={cls.rank} />
-                  <span className="text-xs tracking-widest" style={{ color: "#9ca3af" }}>
-                    {cls.archetype}
-                  </span>
+            {cls.image ? (
+              <div className="relative h-64 overflow-hidden">
+                <img
+                  src={cls.image}
+                  alt={cls.label}
+                  className="w-full h-full object-cover object-top"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: "linear-gradient(to top, rgba(20,25,39,1) 0%, rgba(20,25,39,0.6) 40%, rgba(0,0,0,0.15) 100%)",
+                  }}
+                />
+                <div className="absolute bottom-0 left-0 p-5">
+                  <div className="text-2xl font-bold text-white drop-shadow-lg">{cls.label}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <RankBadge rank={cls.rank} />
+                    <span className="text-xs tracking-widest" style={{ color: "#d1d5db" }}>
+                      {cls.archetype}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className="h-40 flex items-end p-5"
+                style={{ background: cls.gradient }}
+              >
+                <div>
+                  <div className="text-4xl mb-2">{cls.emoji}</div>
+                  <div className="text-2xl font-bold text-white">{cls.label}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <RankBadge rank={cls.rank} />
+                    <span className="text-xs tracking-widest" style={{ color: "#9ca3af" }}>
+                      {cls.archetype}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="p-5 space-y-4">
               <div className="flex flex-wrap gap-2">
@@ -356,29 +393,51 @@ export const Classes = () => {
             <button
               key={c.key}
               onClick={() => setSelected(c.key)}
-              className="w-full text-left rounded-lg p-3 transition-colors"
+              className="w-full text-left rounded-lg overflow-hidden transition-all"
               style={{
-                background: "#141927",
                 border: "1px solid rgba(255,255,255,0.06)",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(124,111,247,0.08)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(124,111,247,0.2)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(124,111,247,0.25)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#141927";
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.06)";
               }}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{c.emoji}</span>
-                <div>
-                  <div className="text-sm font-medium text-white">{c.label}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "#6b7280" }}>
-                    Rank {c.rank} · {c.desc}
+              {c.image ? (
+                <div className="relative h-16 overflow-hidden">
+                  <img
+                    src={c.image}
+                    alt={c.label}
+                    className="w-full h-full object-cover object-top"
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center gap-3 px-3"
+                    style={{ background: "rgba(13,19,33,0.65)" }}
+                  >
+                    <span className="text-xl">{c.emoji}</span>
+                    <div>
+                      <div className="text-sm font-medium text-white">{c.label}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "#d1d5db" }}>
+                        Rank {c.rank} · {c.desc}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div
+                  className="p-3 flex items-center gap-3"
+                  style={{ background: "#141927" }}
+                >
+                  <span className="text-2xl">{c.emoji}</span>
+                  <div>
+                    <div className="text-sm font-medium text-white">{c.label}</div>
+                    <div className="text-xs mt-0.5" style={{ color: "#6b7280" }}>
+                      Rank {c.rank} · {c.desc}
+                    </div>
+                  </div>
+                </div>
+              )}
             </button>
           ))}
         </div>
