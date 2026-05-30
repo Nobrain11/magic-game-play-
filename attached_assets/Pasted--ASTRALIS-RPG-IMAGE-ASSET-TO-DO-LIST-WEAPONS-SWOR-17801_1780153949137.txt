@@ -1,0 +1,281 @@
+🎨 ASTRALIS RPG – IMAGE ASSET TO-DO LIST
+
+━━━━━━━━━━━━━━━━━━━━
+⚔️ WEAPONS
+━━━━━━━━━━━━━━━━━━━━
+
+SWORDS
+• Apprentice Mana Blade
+• Astral Longsword
+• Crystalfang Sword
+• Warlord Greatsword
+• Voidfire Blade
+
+STAVES
+• Novice Staff
+• Arcane Conductor
+• Crystal Staff
+• Chronomancer Rod
+• Staff of Astralis
+
+BOWS
+• Hunter Bow
+• Crystal Bow
+• Windrunner Bow
+• Moonshot Bow
+• Astralis Longbow
+
+DAGGERS
+• Shadow Dagger
+• Mana Dagger
+• Crystal Fang
+• Rift Blade
+• Assassin's Edge
+
+HAMMERS / MACES
+• Stone Hammer
+• Crystal Maul
+• Titan Mace
+• Warlord Crusher
+• Astral Judgement
+
+━━━━━━━━━━━━━━━━━━━━
+🛡️ ARMOR
+━━━━━━━━━━━━━━━━━━━━
+
+HELMETS
+• Cloth Hood
+• Crystal Hood
+• Mage Crown
+• Warlord Helmet
+• Astral Crown
+
+CHEST ARMOR
+• Apprentice Robe
+• Ranger Armor
+• Crystal Plate
+• Warlord Armor
+• Astralis Battlegear
+
+GLOVES
+• Cloth Gloves
+• Leather Grips
+• Crystal Gauntlets
+• Mana Gloves
+• Titan Grips
+
+BOOTS
+• Traveler Boots
+• Ranger Boots
+• Crystal Boots
+• Chrono Boots
+• Astralis Boots
+
+CLOAKS
+• Wanderer Cloak
+• Crystal Cloak
+• Shadow Cloak
+• Mage Cloak
+• Astralis Cape
+
+━━━━━━━━━━━━━━━━━━━━
+🧪 POTIONS & ELIXIRS
+━━━━━━━━━━━━━━━━━━━━
+
+HEALTH POTIONS
+• Small HP Potion
+• Medium HP Potion
+• Large HP Potion
+• Greater HP Potion
+• Divine Healing Potion
+
+MANA POTIONS
+• Small Mana Potion
+• Medium Mana Potion
+• Large Mana Potion
+• Greater Mana Potion
+• Astral Mana Potion
+
+BOOSTERS
+• XP Booster
+• Gold Booster
+• Raid Booster
+• Luck Booster
+• Mana Booster
+
+ELIXIRS
+• Elixir of Power
+• Elixir of Wisdom
+• Elixir of Precision
+• Elixir of Protection
+• Elixir of Time
+
+━━━━━━━━━━━━━━━━━━━━
+⛏️ RESOURCES
+━━━━━━━━━━━━━━━━━━━━
+
+ORES
+• Iron Ore
+• Silver Ore
+• Crystal Ore
+• Mana Ore
+• Astralite Ore
+
+GEMS
+• Blue Crystal
+• Purple Crystal
+• Mana Core
+• Void Crystal
+• Astralis Crystal
+
+CRAFTING MATERIALS
+• Leather
+• Enchanted Wood
+• Dragon Scale
+• Crystal Fragment
+• Ancient Relic
+
+━━━━━━━━━━━━━━━━━━━━
+👹 MONSTERS
+━━━━━━━━━━━━━━━━━━━━
+
+COMMON
+• Mana Rat
+• Crystal Spider
+• Cave Goblin
+• Astral Wolf
+• Void Bat
+
+ELITE
+• Crystal Guardian
+• Void Knight
+• Arcane Golem
+• Ancient Drake
+• Rift Beast
+
+━━━━━━━━━━━━━━━━━━━━
+🔥 BOSSES
+━━━━━━━━━━━━━━━━━━━━
+
+DUNGEON BOSSES
+• Crystal Titan
+• Void Dragon
+• Guardian of Astralis
+• The Timekeeper
+• Ancient Crystalforge
+
+WORLD BOSSES
+• Astral Leviathan
+• The Fallen Wizard
+• The Corrupted Crystal King
+• The Rift Lord
+• The Devourer of Mana
+
+━━━━━━━━━━━━━━━━━━━━
+🏰 DUNGEONS
+━━━━━━━━━━━━━━━━━━━━
+
+• Crystal Caverns
+• Mana Mines
+• Forgotten Library
+• Void Rift
+• Ancient Sewers
+• Astralis Catacombs
+• Dragon Peak
+• Time Temple
+• Crystalforge
+• Astral Citadel
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 LOCATIONS
+━━━━━━━━━━━━━━━━━━━━
+
+• Astralis City
+• Marketplace
+• Wizard Tower
+• Crystal District
+• Mage Quarter
+• Arena
+• Harbor
+• Treasury
+• Portal Plaza
+• Guild Hall
+
+━━━━━━━━━━━━━━━━━━━━
+🎮 GAME UI
+━━━━━━━━━━━━━━━━━━━━
+
+SCREENS
+• Inventory
+• Character Profile
+• Equipment Menu
+• Marketplace
+• Quests
+• Raids
+• Guild Menu
+• Leaderboard
+
+ICONS
+• Gold
+• $MAGIC
+• XP
+• HP
+• Mana
+• Energy
+• Keys
+• Chests
+• Raid Tickets
+
+━━━━━━━━━━━━━━━━━━━━
+💰 MARKETPLACE
+━━━━━━━━━━━━━━━━━━━━
+
+• Marketplace Background
+• Trader NPC
+• Item Cards
+• Buy Button
+• Sell Button
+• Auction Listing
+• Featured Item Banner
+• Marketplace Logo
+
+━━━━━━━━━━━━━━━━━━━━
+📜 QUESTS & RAIDS
+━━━━━━━━━━━━━━━━━━━━
+
+• Quest Board
+• Daily Quest Icon
+• Weekly Quest Icon
+• Raid Entrance
+• Raid Reward Chest
+• Raid Victory Screen
+• Raid Defeat Screen
+
+━━━━━━━━━━━━━━━━━━━━
+🐉 FUTURE CONTENT
+━━━━━━━━━━━━━━━━━━━━
+
+• Mounts
+• Pets
+• Guild Banners
+• Seasonal Events
+• Special Event Bosses
+• Legendary Weapons
+• Legendary Armor Sets
+
+PRIORITY:
+
+1. Weapons
+2. Armor
+3. Potions
+4. Resources
+5. Marketplace
+6. Monsters
+7. Bosses
+8. Dungeons
+9. Locations
+10. UI Assets
+11. Quest Assets
+12. Future Content
+
+Estimated total: 120–150 images for the first polished Astralis RPG version.
