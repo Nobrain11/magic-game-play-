@@ -4,7 +4,9 @@ import { db } from "@workspace/db";
 import { charactersTable } from "@workspace/db";
 import { eq, ne, sql } from "drizzle-orm";
 import { formatMagic } from "../utils/format.js";
-import { PVP_PRIZE } from "@workspace/shared";
+import { getMagicPriceUsd, usdToMagic } from "../utils/price.js";
+
+const ENTRY_FEE_USD = 1.50;
 
 export async function handleArena(ctx: Context) {
   const userId = ctx.from?.id;
@@ -17,6 +19,22 @@ export async function handleArena(ctx: Context) {
   }
   if (char.injured) {
     await ctx.reply("🩸 You are injured! Use /heal before entering the arena.");
+    return;
+  }
+
+  // Fetch live price + compute entry fee
+  const [priceUsd, entryFee] = await Promise.all([
+    getMagicPriceUsd(),
+    usdToMagic(ENTRY_FEE_USD),
+  ]);
+
+  if (char.magic_balance < entryFee) {
+    await ctx.reply(
+      `❌ *Insufficient $MAGIC*\n\nArena entry costs *$${ENTRY_FEE_USD.toFixed(2)}* ≈ *${formatMagic(entryFee)} $MAGIC*\n` +
+      `Your balance: *${formatMagic(char.magic_balance)} $MAGIC*\n\n` +
+      `Complete missions to earn more!`,
+      { parse_mode: "Markdown" }
+    );
     return;
   }
 
@@ -38,8 +56,14 @@ export async function handleArena(ctx: Context) {
     return;
   }
 
-  let msg = `⚔️ *PvP Arena*\n\nPrize: ${formatMagic(PVP_PRIZE)} $MAGIC\n\n`;
-  msg += `*Available Opponents:*\n`;
+  const priceTag = `$${priceUsd < 0.01 ? priceUsd.toExponential(2) : priceUsd.toFixed(6)}`;
+
+  let msg =
+    `⚔️ *PvP Arena*\n\n` +
+    `💰 Entry Fee: *$${ENTRY_FEE_USD.toFixed(2)}* ≈ *${formatMagic(entryFee)} $MAGIC*\n` +
+    `📈 MAGIC price: *${priceTag}*\n\n` +
+    `*Available Opponents:*\n`;
+
   for (const opp of opponents) {
     msg += `• [${opp.user_id}] ${opp.username} — Level ${opp.level} ${opp.class}\n`;
   }
@@ -57,15 +81,32 @@ export async function handleBattle(ctx: Context, targetId: number) {
     return;
   }
 
+  // Compute entry fee at current price
+  const entryFee = await usdToMagic(ENTRY_FEE_USD);
+
+  // Check attacker has enough before attempting
+  const char = await getCharacter(userId);
+  if (!char) {
+    await ctx.reply("❌ Use /create first!");
+    return;
+  }
+  if (char.magic_balance < entryFee) {
+    await ctx.reply(
+      `❌ *Insufficient $MAGIC*\n\nYou need *${formatMagic(entryFee)} $MAGIC* (~$${ENTRY_FEE_USD.toFixed(2)}) to enter the arena.\n` +
+      `Your balance: *${formatMagic(char.magic_balance)} $MAGIC*`,
+      { parse_mode: "Markdown" }
+    );
+    return;
+  }
+
   try {
-    const result = await doBattle(userId, targetId);
+    const result = await doBattle(userId, targetId, entryFee);
     const won = result.winnerId === userId;
-    const self = won ? result.attacker : result.defender;
     const opp = won ? result.defender : result.attacker;
 
     let msg = won
-      ? `⚔️ *Victory!*\n\nYou defeated *${opp.username}*!\n💎 +${formatMagic(PVP_PRIZE)} $MAGIC`
-      : `💀 *Defeated!*\n\n*${opp.username}* was stronger!\n💎 -${formatMagic(PVP_PRIZE)} $MAGIC`;
+      ? `⚔️ *Victory!*\n\nYou defeated *${opp.username}*!\n💎 +${formatMagic(result.magicPrize)} $MAGIC (~$${ENTRY_FEE_USD.toFixed(2)})`
+      : `💀 *Defeated!*\n\n*${opp.username}* was stronger!\n💎 -${formatMagic(result.magicPrize)} $MAGIC (~$${ENTRY_FEE_USD.toFixed(2)})`;
 
     if (result.loserNowInjured && !won) {
       msg += `\n\n🩸 You are now *INJURED*! Use /heal to recover.`;

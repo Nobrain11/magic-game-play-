@@ -229,7 +229,11 @@ export async function upgradeItem(userId: number, itemId: number, char: Characte
 
 // ─────────────────── pvp ───────────────────
 
-export async function doBattle(attackerId: number, defenderId: number): Promise<ReturnType<typeof resolveBattle> & { attacker: Character; defender: Character }> {
+export async function doBattle(
+  attackerId: number,
+  defenderId: number,
+  prizeOverride?: number
+): Promise<ReturnType<typeof resolveBattle> & { attacker: Character; defender: Character }> {
   const attacker = await getCharacter(attackerId);
   const defender = await getCharacter(defenderId);
   if (!attacker || !defender) throw new Error("player_not_found");
@@ -238,18 +242,23 @@ export async function doBattle(attackerId: number, defenderId: number): Promise<
 
   const result = resolveBattle(attacker as unknown as import("@workspace/shared").Character, defender as unknown as import("@workspace/shared").Character);
 
+  // Use dynamic prize if provided (e.g. $1.50 worth of MAGIC), otherwise use the resolver's value
+  const prize = prizeOverride ?? result.magicPrize;
   const winner = result.attackerWon ? attacker : defender;
   const loser = result.attackerWon ? defender : attacker;
+
+  // Ensure loser has enough balance; if not, use what they have
+  const actualPrize = Math.min(prize, loser.magic_balance);
 
   // Update stats
   await db.update(charactersTable).set({
     pvp_wins: winner.pvp_wins + 1,
-    magic_balance: winner.magic_balance + result.magicPrize,
+    magic_balance: winner.magic_balance + actualPrize,
   }).where(eq(charactersTable.user_id, winner.user_id));
 
   await db.update(charactersTable).set({
     pvp_losses: loser.pvp_losses + 1,
-    magic_balance: Math.max(0, loser.magic_balance - result.magicPrize),
+    magic_balance: loser.magic_balance - actualPrize,
     injured: result.loserNowInjured ? 1 : loser.injured,
   }).where(eq(charactersTable.user_id, loser.user_id));
 
@@ -258,10 +267,10 @@ export async function doBattle(attackerId: number, defenderId: number): Promise<
     attacker_id: attackerId,
     defender_id: defenderId,
     winner_id: result.winnerId,
-    magic_won: result.magicPrize,
+    magic_won: actualPrize,
   });
 
-  return { ...result, attacker, defender };
+  return { ...result, magicPrize: actualPrize, attacker, defender };
 }
 
 // ─────────────────── guilds ───────────────────
