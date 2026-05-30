@@ -9,6 +9,9 @@ import { Leaderboard } from "@/pages/leaderboard";
 import { Market } from "@/pages/market";
 import { Burns } from "@/pages/burns";
 import { Guilds } from "@/pages/guilds";
+import { Missions } from "@/pages/missions";
+import { Arena } from "@/pages/arena";
+import { Classes } from "@/pages/classes";
 
 const queryClient = new QueryClient();
 
@@ -18,9 +21,12 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/missions" component={Missions} />
+        <Route path="/arena" component={Arena} />
         <Route path="/market" component={Market} />
         <Route path="/burns" component={Burns} />
         <Route path="/guilds" component={Guilds} />
+        <Route path="/classes" component={Classes} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

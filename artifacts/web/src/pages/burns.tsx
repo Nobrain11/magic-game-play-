@@ -1,120 +1,196 @@
 import { useGetBurnReport, useGetRecentBurns } from "@workspace/api-client-react";
 import { formatNumber } from "@/lib/constants";
-import { Flame, Droplet, ArrowUpRight, History } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Flame } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import { Progress } from "@/components/ui/progress";
+
+type ExtendedReport = {
+  total_burned: number;
+  burn_count: number;
+  total_to_rewards: number;
+  last_24h: number;
+  last_7d: number;
+  treasury_share: number;
+};
+
+const StatCard = ({
+  label,
+  value,
+  sub,
+  color,
+}: {
+  label: string;
+  value: React.ReactNode;
+  sub?: string;
+  color: string;
+}) => (
+  <div
+    className="rounded-lg p-5"
+    style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
+  >
+    <div className="text-[11px] tracking-wider uppercase mb-2" style={{ color: "#6b7280" }}>
+      {label}
+    </div>
+    <div className="text-3xl font-bold" style={{ color }}>
+      {value}
+    </div>
+    {sub && (
+      <div className="text-xs mt-1" style={{ color: "#6b7280" }}>
+        {sub}
+      </div>
+    )}
+  </div>
+);
 
 export const Burns = () => {
-  const { data: report, isLoading: reportLoading } = useGetBurnReport();
-  const { data: recent, isLoading: recentLoading } = useGetRecentBurns({ limit: 15 });
+  const { data: rawReport, isLoading: reportLoading } = useGetBurnReport();
+  const report = rawReport as ExtendedReport | undefined;
+  const { data: recent, isLoading: recentLoading } = useGetRecentBurns({ limit: 20 });
 
   return (
-    <div className="container mx-auto px-4 py-12 space-y-12">
-      <div className="text-center space-y-4 max-w-2xl mx-auto">
-        <div className="inline-flex items-center justify-center p-4 rounded-full bg-accent/10 border border-accent/20 mb-4 animate-pulse-slow">
-          <Flame className="w-12 h-12 text-accent" />
+    <div className="p-6 space-y-6">
+      <div>
+        <div className="flex items-center gap-2">
+          <Flame className="w-5 h-5" style={{ color: "#f59e0b" }} />
+          <h1 className="text-xl font-bold text-white">Burn Tracker</h1>
         </div>
-        <h1 className="text-4xl font-serif font-bold text-glow-accent text-accent tracking-widest uppercase">
-          The Cosmic Forge
-        </h1>
-        <p className="font-mono text-muted-foreground">
-          Tokens burned in the forge are removed from existence, fueling the arcane engine and rewarding the faithful.
+        <p className="text-sm mt-0.5" style={{ color: "#6b7280" }}>
+          Token burn statistics and event log
         </p>
       </div>
 
-      {reportLoading ? (
-        <Skeleton className="h-48 w-full max-w-4xl mx-auto rounded-xl bg-card border border-primary/10" />
-      ) : report ? (
-        <div className="max-w-4xl mx-auto">
-          <Card className="glass-panel border-accent/30 shadow-[0_0_30px_rgba(251,191,36,0.1)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-[80px] -z-10" />
-            <CardContent className="p-8 space-y-8">
-              <div className="text-center">
-                <span className="font-mono text-sm text-accent uppercase tracking-widest">Total $MAGIC Sacrificed</span>
-                <div className="text-5xl md:text-7xl font-serif font-black text-glow-accent text-accent mt-2">
-                  {formatNumber(report.total_burned)}
-                </div>
-              </div>
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard
+          label="Total Burned"
+          value={reportLoading ? "—" : formatNumber(report?.total_burned ?? 0)}
+          sub="ASTRAL tokens"
+          color="#f59e0b"
+        />
+        <StatCard
+          label="Total Burns"
+          value={reportLoading ? "—" : report?.burn_count ?? 0}
+          sub="Burn events"
+          color="#ffffff"
+        />
+        <StatCard
+          label="Treasury Share"
+          value={reportLoading ? "—" : formatNumber(report?.treasury_share ?? 0)}
+          sub="Allocated to treasury"
+          color="#7c6ff7"
+        />
+      </div>
 
-              <div className="space-y-4">
-                <div className="flex justify-between text-xs font-mono uppercase text-muted-foreground">
-                  <span>Burn Split</span>
-                  <span>100%</span>
-                </div>
-                
-                {/* Visual representation of the split: 30% burn, 20% marketing, 10% buyback, 40% rewards */}
-                <div className="h-4 w-full flex rounded-full overflow-hidden opacity-80">
-                  <div className="bg-red-500 h-full" style={{ width: '30%' }} title="Forever Burned (30%)" />
-                  <div className="bg-purple-500 h-full" style={{ width: '40%' }} title="Rewards Pool (40%)" />
-                  <div className="bg-blue-500 h-full" style={{ width: '20%' }} title="Marketing (20%)" />
-                  <div className="bg-green-500 h-full" style={{ width: '10%' }} title="Buyback (10%)" />
-                </div>
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard
+          label="Reward Pool"
+          value={reportLoading ? "—" : formatNumber(report?.total_to_rewards ?? 0)}
+          sub="Allocated to rewards"
+          color="#4ade80"
+        />
+        <StatCard
+          label="Last 24H"
+          value={reportLoading ? "—" : formatNumber(report?.last_24h ?? 0)}
+          sub="ASTRAL burned"
+          color="#f59e0b"
+        />
+        <StatCard
+          label="Last 7 Days"
+          value={reportLoading ? "—" : formatNumber(report?.last_7d ?? 0)}
+          sub="ASTRAL burned"
+          color="#7c6ff7"
+        />
+      </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                  <SplitStat label="Forever Burned" value={report.total_burned * 0.3} percent="30%" color="text-red-500" />
-                  <SplitStat label="Rewards Pool" value={report.total_to_rewards} percent="40%" color="text-purple-500" />
-                  <SplitStat label="Marketing" value={report.total_to_marketing} percent="20%" color="text-blue-500" />
-                  <SplitStat label="Buyback Engine" value={report.total_to_buyback} percent="10%" color="text-green-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Flame className="w-4 h-4" style={{ color: "#f59e0b" }} />
+          <span className="text-sm font-semibold tracking-wider uppercase text-white">
+            Recent Burn Events
+          </span>
         </div>
-      ) : null}
 
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h2 className="text-2xl font-serif tracking-widest flex items-center gap-3 border-b border-primary/20 pb-4">
-          <History className="w-6 h-6 text-primary" />
-          Recent Sacrifices
-        </h2>
+        <div
+          className="rounded-lg overflow-hidden"
+          style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          <table className="w-full">
+            <thead>
+              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                {["TRIGGER", "AMOUNT", "TREASURY", "REWARD POOL", "PLAYER", "TIME"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider"
+                    style={{ color: "#6b7280" }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {recentLoading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                      {Array.from({ length: 6 }).map((__, j) => (
+                        <td key={j} className="px-4 py-3">
+                          <Skeleton className="h-4 w-20" style={{ background: "#1e2a3a" }} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                : (recent?.burns ?? []).map((burn) => {
+                    const treasury = Math.floor(burn.burned * 0.5);
+                    const rewardPool = burn.burned - treasury;
+                    const sigShort = burn.tx_signature
+                      ? `sig_${burn.tx_signature.substring(0, 10)}...`
+                      : "—";
 
-        <div className="space-y-3">
-          {recentLoading ? (
-            Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg bg-card border border-primary/10" />)
-          ) : (
-            recent?.burns.map((burn) => (
-              <div key={burn.id} className="glass-panel p-4 rounded-lg flex items-center justify-between border-primary/10 hover:border-accent/30 transition-colors group">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Flame className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <div className="font-serif text-lg text-foreground">{burn.username}</div>
-                    <div className="font-mono text-xs text-muted-foreground flex items-center gap-2">
-                      <span>{formatDistanceToNow(new Date(burn.burned_at), { addSuffix: true })}</span>
-                      <span>•</span>
-                      <a href={`https://solscan.io/tx/${burn.tx_signature}`} target="_blank" rel="noreferrer" className="flex items-center hover:text-primary transition-colors">
-                        Tx <ArrowUpRight className="w-3 h-3 ml-0.5" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className="font-mono font-bold text-accent text-lg">
-                    {formatNumber(burn.total_amount)}
-                  </div>
-                  <div className="font-mono text-[10px] text-muted-foreground uppercase">
-                    $MAGIC
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+                    return (
+                      <tr
+                        key={burn.id}
+                        style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.02)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLTableRowElement).style.background = "transparent";
+                        }}
+                      >
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-white">Token Burn</div>
+                          <div className="text-xs mt-0.5" style={{ color: "#6b7280" }}>
+                            {sigShort}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold" style={{ color: "#f59e0b" }}>
+                          {formatNumber(burn.burned)}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: "#9ca3af" }}>
+                          {formatNumber(treasury)}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: "#4ade80" }}>
+                          {formatNumber(rewardPool)}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: "#9ca3af" }}>
+                          {burn.username ?? `#${burn.user_id}`}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: "#6b7280" }}>
+                          {formatDistanceToNow(new Date(burn.burned_at), { addSuffix: true })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              {!recentLoading && (recent?.burns ?? []).length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "#6b7280" }}>
+                    No burn events yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
-
-const SplitStat = ({ label, value, percent, color }: { label: string, value: number, percent: string, color: string }) => (
-  <div className="p-3 bg-background/50 rounded border border-primary/10 flex flex-col gap-1">
-    <div className="flex items-center justify-between font-mono text-[10px] uppercase">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={color}>{percent}</span>
-    </div>
-    <span className={`font-mono font-bold ${color}`}>{formatNumber(value)}</span>
-  </div>
-);

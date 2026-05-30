@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { burnsTable, charactersTable } from "@workspace/db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, gt } from "drizzle-orm";
 import { GetRecentBurnsQueryParams } from "@workspace/api-zod";
 
 const router = Router();
@@ -22,6 +22,20 @@ router.get("/", async (req, res) => {
       .orderBy(desc(burnsTable.burned_at))
       .limit(1);
 
+    // Last 24h and 7 day burns
+    const h24ago = new Date(Date.now() - 86400 * 1000);
+    const d7ago = new Date(Date.now() - 7 * 86400 * 1000);
+
+    const [last24h] = await db
+      .select({ total: sql<number>`coalesce(sum(burned), 0)::int` })
+      .from(burnsTable)
+      .where(gt(burnsTable.burned_at, h24ago));
+
+    const [last7d] = await db
+      .select({ total: sql<number>`coalesce(sum(burned), 0)::int` })
+      .from(burnsTable)
+      .where(gt(burnsTable.burned_at, d7ago));
+
     res.json({
       total_burned: agg?.total_burned ?? 0,
       total_to_marketing: agg?.total_to_marketing ?? 0,
@@ -29,6 +43,9 @@ router.get("/", async (req, res) => {
       total_to_rewards: agg?.total_to_rewards ?? 0,
       burn_count: agg?.burn_count ?? 0,
       last_burn_at: lastBurn?.burned_at?.toISOString() ?? null,
+      last_24h: last24h?.total ?? 0,
+      last_7d: last7d?.total ?? 0,
+      treasury_share: agg?.total_to_rewards ?? 0,
     });
   } catch (err) {
     req.log.error({ err }, "burn report error");
@@ -48,7 +65,10 @@ router.get("/recent", async (req, res) => {
         username: charactersTable.username,
         total_amount: burnsTable.total_amount,
         burned: burnsTable.burned,
+        marketing: burnsTable.marketing,
+        rewards: burnsTable.rewards,
         tx_signature: burnsTable.tx_signature,
+        mission_id: burnsTable.mission_id,
         burned_at: burnsTable.burned_at,
       })
       .from(burnsTable)

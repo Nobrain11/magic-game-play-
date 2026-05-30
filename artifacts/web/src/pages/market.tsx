@@ -1,113 +1,137 @@
 import { useState } from "react";
 import { useGetMarketListings } from "@workspace/api-client-react";
 import { formatNumber, RARITIES } from "@/lib/constants";
-import { Store, Tag, Sparkles } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { ShoppingBag } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { formatDistanceToNow } from "date-fns";
+
+const RARITY_TABS = ["All", "Common", "Uncommon", "Rare", "Epic", "Legendary"];
+
+const rarityColor = (rarity: string) => {
+  const r = rarity?.toLowerCase();
+  if (r === "legendary") return { color: "#f59e0b", border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.08)" };
+  if (r === "epic") return { color: "#a78bfa", border: "1px solid rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.08)" };
+  if (r === "rare") return { color: "#60a5fa", border: "1px solid rgba(96,165,250,0.3)", background: "rgba(96,165,250,0.08)" };
+  if (r === "uncommon") return { color: "#4ade80", border: "1px solid rgba(74,222,128,0.3)", background: "rgba(74,222,128,0.08)" };
+  return { color: "#9ca3af", border: "1px solid rgba(156,163,175,0.3)", background: "rgba(156,163,175,0.08)" };
+};
+
+const priceColor = (currency: string) => {
+  if (currency === "astral") return "#7c6ff7";
+  return "#f59e0b";
+};
 
 export const Market = () => {
-  const [rarity, setRarity] = useState<string>("all");
-  const [type, setType] = useState<string>("all");
+  const [activeRarity, setActiveRarity] = useState<string>("All");
 
   const { data, isLoading } = useGetMarketListings({
-    rarity: rarity !== "all" ? rarity : undefined,
-    item_type: type !== "all" ? type : undefined,
-    limit: 40
+    rarity: activeRarity !== "All" ? activeRarity : undefined,
+    limit: 40,
   });
 
   return (
-    <div className="container mx-auto px-4 py-12 space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-glow tracking-widest flex items-center gap-3">
-            <Store className="w-8 h-8 text-primary" />
-            THE BAZAAR
-          </h1>
-          <p className="font-mono text-muted-foreground mt-2">Trade artifacts infused with cosmic power.</p>
+    <div className="p-6 space-y-5">
+      <div>
+        <div className="flex items-center gap-2">
+          <ShoppingBag className="w-5 h-5" style={{ color: "#7c6ff7" }} />
+          <h1 className="text-xl font-bold text-white">Marketplace</h1>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <Select value={rarity} onValueChange={setRarity}>
-            <SelectTrigger className="w-full sm:w-40 glass-panel font-mono border-primary/30">
-              <SelectValue placeholder="Rarity" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-primary/30 text-foreground font-mono">
-              <SelectItem value="all">All Rarities</SelectItem>
-              {Object.keys(RARITIES).map(r => (
-                <SelectItem key={r} value={r}>{r}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="w-full sm:w-40 glass-panel font-mono border-primary/30">
-              <SelectValue placeholder="Item Type" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-primary/30 text-foreground font-mono">
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="weapon">Weapon</SelectItem>
-              <SelectItem value="armor">Armor</SelectItem>
-              <SelectItem value="helmet">Helmet</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <p className="text-sm mt-0.5" style={{ color: "#6b7280" }}>
+          Active item listings
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {isLoading ? (
-          Array(8).fill(0).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-xl bg-card border border-primary/10" />)
-        ) : data?.listings.length === 0 ? (
-          <div className="col-span-full py-20 text-center space-y-4">
-            <Store className="w-16 h-16 text-muted-foreground mx-auto opacity-20" />
-            <p className="font-mono text-muted-foreground">The stalls are empty. No items found.</p>
-          </div>
-        ) : (
-          data?.listings.map((item) => {
-            const rData = RARITIES[item.rarity] || RARITIES['Common'];
-            
-            return (
-              <Card key={item.listing_id} className={`glass-panel overflow-hidden flex flex-col ${rData.bg} transition-all hover:scale-105 hover:z-10`}>
-                <CardContent className="p-6 flex-1 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <span className="text-4xl" role="img" aria-label={item.item_type}>{item.emoji}</span>
-                    <span className={`font-mono text-[10px] uppercase px-2 py-1 rounded-full border ${rData.color} border-current bg-background/50 backdrop-blur-md`}>
-                      {rData.emoji} {item.rarity}
+      <div className="flex items-center gap-2 flex-wrap">
+        {RARITY_TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveRarity(tab)}
+            className="px-4 py-1.5 rounded text-sm font-medium transition-colors"
+            style={
+              activeRarity === tab
+                ? { background: "#7c6ff7", color: "#ffffff" }
+                : {
+                    background: "#141927",
+                    color: "#6b7280",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }
+            }
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-44 rounded-lg"
+                style={{ background: "#141927" }}
+              />
+            ))
+          : (data?.listings ?? []).length === 0
+          ? (
+            <div className="col-span-3 py-16 text-center text-sm" style={{ color: "#6b7280" }}>
+              <ShoppingBag className="w-10 h-10 mx-auto mb-3 opacity-20" />
+              No listings found
+            </div>
+          )
+          : (data?.listings ?? []).map((item) => {
+              const rc = rarityColor(item.rarity);
+              const currency = (item as { currency?: string }).currency ?? "gold";
+              return (
+                <div
+                  key={item.listing_id}
+                  className="rounded-lg p-5 flex flex-col gap-3"
+                  style={{
+                    background: "#141927",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <div className="flex items-start justify-between">
+                    <span
+                      className="text-xs px-2 py-0.5 rounded font-medium capitalize"
+                      style={rc}
+                    >
+                      {item.rarity?.toLowerCase()}
+                    </span>
+                    <span className="text-xs capitalize" style={{ color: "#6b7280" }}>
+                      {item.item_type}
                     </span>
                   </div>
-                  
+
                   <div>
-                    <h3 className="font-serif text-lg font-bold tracking-wide">{item.item_name}</h3>
-                    <p className="font-mono text-xs text-muted-foreground uppercase mt-1">Lvl {item.level} {item.item_type}</p>
-                  </div>
-                  
-                  <div className="bg-background/40 rounded p-3 font-mono text-sm border border-primary/10">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground uppercase text-xs">{item.stat_type}</span>
-                      <span className="text-primary font-bold">+{item.stat_value}</span>
+                    <div className="text-base font-semibold text-white leading-snug">
+                      {item.item_name}
+                    </div>
+                    <div className="text-2xl font-bold mt-2" style={{ color: priceColor(currency) }}>
+                      {formatNumber(item.price)}{" "}
+                      <span className="text-sm font-normal" style={{ color: "#6b7280" }}>
+                        {currency}
+                      </span>
                     </div>
                   </div>
-                  
-                  <div className="pt-2 text-xs font-mono text-muted-foreground flex items-center gap-2">
-                    <Tag className="w-3 h-3" />
-                    Seller: <span className="text-foreground">{item.seller_username}</span>
-                  </div>
-                </CardContent>
-                
-                <CardFooter className="p-0">
-                  <Button className="w-full rounded-none h-14 bg-primary/10 hover:bg-primary/20 text-primary font-mono font-bold border-t border-primary/20 flex justify-between px-6 transition-colors">
-                    <span>PRICE</span>
-                    <span className="flex items-center gap-1 text-lg">
-                      <Sparkles className="w-4 h-4" />
-                      {formatNumber(item.price)}
+
+                  <div
+                    className="flex items-center justify-between text-xs pt-2"
+                    style={{
+                      borderTop: "1px solid rgba(255,255,255,0.06)",
+                      color: "#6b7280",
+                    }}
+                  >
+                    <span>Seller: {item.seller_username}</span>
+                    <span>
+                      {formatDistanceToNow(
+                        new Date((item as { listed_at?: string }).listed_at ?? Date.now()),
+                        { addSuffix: true }
+                      )}
                     </span>
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })
-        )}
+                  </div>
+                </div>
+              );
+            })}
       </div>
     </div>
   );

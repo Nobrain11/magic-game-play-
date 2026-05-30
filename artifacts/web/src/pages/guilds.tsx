@@ -1,85 +1,168 @@
 import { useGetGuilds } from "@workspace/api-client-react";
-import { formatNumber } from "@/lib/constants";
-import { Shield, Users, Crown, Skull } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Shield, Users, Coins, Trophy } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
+import { formatNumber } from "@/lib/constants";
+
+type GuildRow = {
+  id: number;
+  name: string;
+  leader_id: number;
+  leader_username: string;
+  level: number;
+  xp: number;
+  member_count: number;
+  created_at: string;
+  wins?: number;
+  losses?: number;
+  tag?: string;
+};
+
+const guildTag = (name: string): string => {
+  const words = name.trim().split(/\s+/);
+  if (words.length === 1) return name.substring(0, 3).toUpperCase();
+  return words
+    .map((w) => w[0])
+    .join("")
+    .substring(0, 4)
+    .toUpperCase();
+};
 
 export const Guilds = () => {
   const { data, isLoading } = useGetGuilds();
 
   return (
-    <div className="container mx-auto px-4 py-12 space-y-8">
-      <div className="text-center space-y-4 max-w-2xl mx-auto mb-12">
-        <h1 className="text-4xl font-serif font-bold text-glow tracking-widest flex items-center justify-center gap-3 uppercase">
-          <Shield className="w-10 h-10 text-primary" />
-          Guild Halls
-        </h1>
-        <p className="font-mono text-muted-foreground">
-          Factions forged in the void. Unite to conquer raid bosses and claim dominance over the realm.
+    <div className="p-6 space-y-5">
+      <div>
+        <div className="flex items-center gap-2">
+          <Shield className="w-5 h-5" style={{ color: "#7c6ff7" }} />
+          <h1 className="text-xl font-bold text-white">Guilds</h1>
+        </div>
+        <p className="text-sm mt-0.5" style={{ color: "#6b7280" }}>
+          All guilds in Astralis
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isLoading ? (
-          Array(6).fill(0).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-xl bg-card border border-primary/10" />)
-        ) : data?.guilds.length === 0 ? (
-          <div className="col-span-full py-20 text-center space-y-4">
-            <Shield className="w-16 h-16 text-muted-foreground mx-auto opacity-20" />
-            <p className="font-mono text-muted-foreground">No guilds have been founded yet.</p>
-          </div>
-        ) : (
-          data?.guilds.map((guild) => (
-            <Card key={guild.id} className="glass-panel overflow-hidden border-primary/20 hover:border-primary/50 transition-all hover:-translate-y-1 relative group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[40px] group-hover:bg-primary/10 transition-colors -z-10" />
-              
-              <CardContent className="p-6 space-y-6">
-                <div className="flex justify-between items-start">
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-52 rounded-lg" style={{ background: "#141927" }} />
+          ))}
+        </div>
+      ) : (data?.guilds ?? []).length === 0 ? (
+        <div className="py-16 text-center text-sm" style={{ color: "#6b7280" }}>
+          <Shield className="w-10 h-10 mx-auto mb-3 opacity-20" />
+          No guilds founded yet
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          {(data?.guilds ?? []).map((guild) => {
+            const g = guild as GuildRow;
+            const tag = g.tag ?? guildTag(g.name);
+            const wins = g.wins ?? 0;
+            const losses = g.losses ?? 0;
+            const bank = formatNumber(g.xp ?? 0);
+
+            return (
+              <div
+                key={g.id}
+                className="rounded-lg p-5"
+                style={{
+                  background: "#141927",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h3 className="font-serif text-2xl font-bold tracking-wide text-glow">{guild.name}</h3>
-                    <div className="font-mono text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                      <Crown className="w-3 h-3 text-accent" />
-                      Leader: <span className="text-foreground">{guild.leader_username}</span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-xs font-mono px-1.5 py-0.5 rounded"
+                        style={{
+                          color: "#7c6ff7",
+                          background: "rgba(124,111,247,0.12)",
+                          border: "1px solid rgba(124,111,247,0.25)",
+                        }}
+                      >
+                        [{tag}]
+                      </span>
+                    </div>
+                    <div className="text-lg font-bold text-white mt-1">{g.name}</div>
+                    <div className="text-sm mt-0.5" style={{ color: "#6b7280" }}>
+                      A guild in the Astralis universe
                     </div>
                   </div>
-                  
-                  <div className="flex flex-col items-center justify-center w-12 h-12 rounded bg-background border border-primary/30">
-                    <span className="font-mono text-[10px] text-muted-foreground uppercase">Lvl</span>
-                    <span className="font-serif font-bold text-primary">{guild.level}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-background/50 border border-primary/10 p-3 rounded flex items-center gap-3">
-                    <Users className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <div className="font-mono text-[10px] uppercase text-muted-foreground">Members</div>
-                      <div className="font-mono font-bold">{guild.member_count}</div>
+                  <div className="text-right flex-none">
+                    <div className="text-[11px] tracking-wider uppercase" style={{ color: "#6b7280" }}>
+                      Level
                     </div>
-                  </div>
-                  
-                  <div className={`border p-3 rounded flex items-center gap-3 ${
-                    guild.raid_boss ? 'bg-red-500/10 border-red-500/30' : 'bg-background/50 border-primary/10'
-                  }`}>
-                    <Skull className={`w-5 h-5 ${guild.raid_boss ? 'text-red-500' : 'text-muted-foreground'}`} />
-                    <div>
-                      <div className="font-mono text-[10px] uppercase text-muted-foreground">Status</div>
-                      <div className={`font-mono font-bold text-sm ${guild.raid_boss ? 'text-red-400' : 'text-foreground'}`}>
-                        {guild.raid_boss ? 'In Raid' : 'Idle'}
-                      </div>
+                    <div className="text-2xl font-bold" style={{ color: "#7c6ff7" }}>
+                      {g.level}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-between items-center text-xs font-mono text-muted-foreground border-t border-primary/10">
-                  <span>Founded</span>
-                  <span>{formatDistanceToNow(new Date(guild.created_at))} ago</span>
+                <div
+                  className="grid grid-cols-3 gap-3 mt-4 pt-4"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users className="w-3.5 h-3.5" style={{ color: "#6b7280" }} />
+                      <span className="text-[11px] tracking-wider uppercase" style={{ color: "#6b7280" }}>
+                        Members
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold text-white">
+                      {g.member_count}
+                      <span style={{ color: "#6b7280" }}>/50</span>
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Trophy className="w-3.5 h-3.5" style={{ color: "#6b7280" }} />
+                      <span className="text-[11px] tracking-wider uppercase" style={{ color: "#6b7280" }}>
+                        Record
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold">
+                      <span style={{ color: "#4ade80" }}>{wins}W</span>
+                      {" "}
+                      <span style={{ color: "#ef4444" }}>{losses}L</span>
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Coins className="w-3.5 h-3.5" style={{ color: "#6b7280" }} />
+                      <span className="text-[11px] tracking-wider uppercase" style={{ color: "#6b7280" }}>
+                        Bank
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold" style={{ color: "#f59e0b" }}>
+                      {bank}
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+
+                <div
+                  className="flex items-center justify-between mt-4 pt-3 text-xs"
+                  style={{
+                    borderTop: "1px solid rgba(255,255,255,0.06)",
+                    color: "#6b7280",
+                  }}
+                >
+                  <span>Leader: {g.leader_username}</span>
+                  <span>
+                    Founded{" "}
+                    {formatDistanceToNow(new Date(g.created_at), { addSuffix: true })}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -7,6 +7,8 @@ import marketRouter from "./market";
 import burnsRouter from "./burns";
 import guildsRouter from "./guilds";
 import playersRouter from "./players";
+import battlesRouter from "./battles";
+import missionsLogRouter from "./missions-log";
 
 const router: IRouter = Router();
 
@@ -18,5 +20,7 @@ router.use("/market", marketRouter);
 router.use("/burns", burnsRouter);
 router.use("/guilds", guildsRouter);
 router.use("/players", playersRouter);
+router.use("/battles", battlesRouter);
+router.use("/missions-log", missionsLogRouter);
 
 export default router;
