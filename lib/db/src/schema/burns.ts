@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -13,7 +13,9 @@ export const burnsTable = pgTable("burns", {
   tx_signature: text("tx_signature").notNull(),
   mission_id: integer("mission_id"),
   burned_at: timestamp("burned_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("burns_user_id_idx").on(table.user_id),
+]);
 
 export const insertBurnSchema = createInsertSchema(burnsTable).omit({ id: true, burned_at: true });
 export type InsertBurn = z.infer<typeof insertBurnSchema>;

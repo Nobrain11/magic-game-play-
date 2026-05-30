@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -16,7 +16,10 @@ export const inventoryTable = pgTable("inventory", {
   for_sale: integer("for_sale").notNull().default(0),
   price: integer("price").notNull().default(0),
   obtained_at: timestamp("obtained_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("inventory_user_id_idx").on(table.user_id),
+  index("inventory_for_sale_idx").on(table.for_sale),
+]);
 
 export const insertInventorySchema = createInsertSchema(inventoryTable).omit({ id: true, obtained_at: true });
 export type InsertInventory = z.infer<typeof insertInventorySchema>;

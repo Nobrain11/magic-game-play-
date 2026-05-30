@@ -27,7 +27,7 @@ export const Leaderboard = () => {
         </div>
         
         <div className="w-full md:w-64">
-          <Select value={filterBy} onValueChange={(val) => setFilterBy(val as GetLeaderboardBy)}>
+          <Select value={filterBy} onValueChange={(val) => setFilterBy(val as LeaderboardBy)}>
             <SelectTrigger className="glass-panel font-mono border-primary/30">
               <SelectValue placeholder="Sort by..." />
             </SelectTrigger>

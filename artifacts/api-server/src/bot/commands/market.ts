@@ -3,7 +3,7 @@ import { getCharacter, listItem, buyItem, db } from "../services/db.js";
 import { marketTable, inventoryTable, charactersTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { formatMagic } from "../utils/format.js";
-import { MIN_SELL_PRICE } from "@workspace/shared";
+import { MIN_SELL_PRICE, MAX_SELL_PRICE } from "@workspace/shared";
 
 export async function handleMarket(ctx: Context, page = 0) {
   const userId = ctx.from?.id;
@@ -64,6 +64,10 @@ export async function handleSell(ctx: Context, itemId: number, price: number) {
     await ctx.reply(`❌ Minimum price is ${formatMagic(MIN_SELL_PRICE)} $MAGIC.`);
     return;
   }
+  if (price > MAX_SELL_PRICE) {
+    await ctx.reply(`❌ Maximum price is ${formatMagic(MAX_SELL_PRICE)} $MAGIC.`);
+    return;
+  }
 
   try {
     const listing = await listItem(userId, itemId, price, char);
@@ -76,6 +80,7 @@ export async function handleSell(ctx: Context, itemId: number, price: number) {
     if (message === "not_owned") await ctx.reply("❌ You don't own that item.");
     else if (message === "already_listed") await ctx.reply("❌ Item is already listed.");
     else if (message === "price_too_low") await ctx.reply(`❌ Minimum price: ${formatMagic(MIN_SELL_PRICE)} $MAGIC.`);
+    else if (message === "price_too_high") await ctx.reply(`❌ Maximum price: ${formatMagic(MAX_SELL_PRICE)} $MAGIC.`);
     else await ctx.reply("❌ Could not list item.");
   }
 }

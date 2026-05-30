@@ -7,7 +7,7 @@ export async function handleHelp(ctx: Context) {
 /start — Welcome screen
 /create — Create your character
 /profile — View your stats
-/heal — Heal injuries (${50_000..toLocaleString()} $MAGIC)
+/heal — Heal injuries (${(50_000).toLocaleString()} $MAGIC)
 
 ⚔️ *Combat*
 /arena — Browse PvP opponents

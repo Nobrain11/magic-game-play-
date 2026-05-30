@@ -12,7 +12,7 @@ export function resolveBattle(
   let turn = 0
 
   // Determine who goes first by speed
-  let aFirst = attacker.speed >= defender.speed
+  const aFirst = attacker.speed >= defender.speed
 
   while (attackerHp > 0 && defenderHp > 0) {
     if (aFirst) {
@@ -33,10 +33,12 @@ export function resolveBattle(
       defenderHp -= dmg
     }
     turn++
-    if (turn > 50) break // safety valve — higher speed wins ties
+    // Safety valve: after 50 turns, higher-speed fighter (attacker) wins HP ties
+    if (turn > 50) break
   }
 
-  const attackerWon = attackerHp > defenderHp
+  // On exact HP tie, attacker wins (they had higher or equal speed)
+  const attackerWon = attackerHp >= defenderHp
   const winnerId = attackerWon ? attacker.user_id : defender.user_id
   const loserId = attackerWon ? defender.user_id : attacker.user_id
   const loserLosses = attackerWon ? defender.pvp_losses + 1 : attacker.pvp_losses + 1

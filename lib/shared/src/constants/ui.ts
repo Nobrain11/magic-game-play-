@@ -3,6 +3,7 @@ export const ITEMS_PER_PAGE = 4
 export const LEADERBOARD_SIZE = 10
 export const MAX_GUILD_NAME_LENGTH = 30
 export const MIN_SELL_PRICE = 1_000
+export const MAX_SELL_PRICE = 100_000_000
 export const GUILD_CREATE_COST = 500_000
 export const HEAL_COST = 50_000
 export const PVP_PRIZE = 50_000

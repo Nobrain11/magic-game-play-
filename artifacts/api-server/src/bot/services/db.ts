@@ -18,6 +18,8 @@ import type {
   MarketListing,
 } from "@workspace/db";
 import { eq, and, desc, sql, ne } from "drizzle-orm";
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
 import {
   applyXp,
   applyLevelUpStats,
@@ -34,6 +36,7 @@ import {
   GUILD_CREATE_COST,
   HEAL_COST,
   MIN_SELL_PRICE,
+  MAX_SELL_PRICE,
   DAILY_QUESTS_POOL,
   ITEMS_PER_PAGE,
   RANK_LABELS,
@@ -118,40 +121,48 @@ export async function collectMission(
   const reward = resolveMission(mission.difficulty as MissionDifficulty);
   const { newLevel, overflow, levelsGained } = applyXp(char.level, char.xp, reward.xpGained);
   const newStats = applyLevelUpStats(char, char.class as ClassKey, levelsGained);
+  const newRank = newLevel >= 80 ? "S" : newLevel >= 60 ? "A" : newLevel >= 40 ? "B" : newLevel >= 20 ? "C" : "D";
 
-  // Add item to inventory if dropped
-  let itemId: number | null = null;
-  if (reward.item) {
-    const [inv] = await db
-      .insert(inventoryTable)
-      .values({ user_id: userId, ...reward.item, item_img: reward.item.item_img ?? undefined })
+  let droppedItem: ReturnType<typeof rollItem> | null = null;
+
+  await db.transaction(async (tx) => {
+    // Mark collected first — atomic guard against double-claim
+    const [marked] = await tx
+      .update(missionsTable)
+      .set({ collected: 1 })
+      .where(and(eq(missionsTable.id, mission.id), eq(missionsTable.collected, 0)))
       .returning();
-    itemId = inv?.id ?? null;
-  }
+    if (!marked) throw new Error("already_collected");
 
-  // Update character
-  await db.update(charactersTable).set({
-    level: newLevel,
-    xp: overflow,
-    rank: newStats.hp > char.max_hp ? (newLevel >= 80 ? "S" : newLevel >= 60 ? "A" : newLevel >= 40 ? "B" : newLevel >= 20 ? "C" : "D") : char.rank,
-    hp: newStats.hp,
-    max_hp: newStats.max_hp,
-    attack: newStats.attack,
-    defense: newStats.defense,
-    magic: newStats.magic,
-    speed: newStats.speed,
-    crit: newStats.crit,
-    magic_balance: char.magic_balance + reward.magicEarned,
-  }).where(eq(charactersTable.user_id, userId));
+    // Insert item drop inside transaction so it's all-or-nothing
+    if (reward.item) {
+      droppedItem = reward.item;
+      await tx
+        .insert(inventoryTable)
+        .values({ user_id: userId, ...reward.item, item_img: reward.item.item_img ?? undefined });
+    }
 
-  // Mark mission collected
-  await db.update(missionsTable).set({ collected: 1 }).where(eq(missionsTable.id, mission.id));
+    // Update character stats
+    await tx.update(charactersTable).set({
+      level: newLevel,
+      xp: overflow,
+      rank: levelsGained > 0 ? newRank : char.rank,
+      hp: newStats.hp,
+      max_hp: newStats.max_hp,
+      attack: newStats.attack,
+      defense: newStats.defense,
+      magic: newStats.magic,
+      speed: newStats.speed,
+      crit: newStats.crit,
+      magic_balance: char.magic_balance + reward.magicEarned,
+    }).where(eq(charactersTable.user_id, userId));
+  });
 
   return {
     mission,
     xpGained: reward.xpGained,
     magicEarned: reward.magicEarned,
-    item: reward.item,
+    item: droppedItem,
     levelsGained,
     newLevel,
   };
@@ -267,13 +278,14 @@ export async function createGuild(userId: number, name: string, char: Character)
   const [existing] = await db.select().from(guildsTable).where(eq(guildsTable.name, name));
   if (existing) throw new Error("name_taken");
 
-  const [guild] = await db.insert(guildsTable).values({ name, leader_id: userId }).returning();
-  await db.update(charactersTable).set({
-    guild_id: guild!.id,
-    magic_balance: char.magic_balance - GUILD_CREATE_COST,
-  }).where(eq(charactersTable.user_id, userId));
-
-  return guild!;
+  return await db.transaction(async (tx) => {
+    const [guild] = await tx.insert(guildsTable).values({ name, leader_id: userId }).returning();
+    await tx.update(charactersTable).set({
+      guild_id: guild!.id,
+      magic_balance: char.magic_balance - GUILD_CREATE_COST,
+    }).where(eq(charactersTable.user_id, userId));
+    return guild!;
+  });
 }
 
 export async function joinGuild(userId: number, guildId: number, char: Character): Promise<void> {
@@ -293,6 +305,7 @@ export async function leaveGuild(userId: number, char: Character): Promise<void>
 
 export async function listItem(userId: number, itemId: number, price: number, char: Character): Promise<MarketListing> {
   if (price < MIN_SELL_PRICE) throw new Error("price_too_low");
+  if (price > MAX_SELL_PRICE) throw new Error("price_too_high");
   const item = await getItem(itemId);
   if (!item || item.user_id !== userId) throw new Error("not_owned");
   if (item.for_sale) throw new Error("already_listed");
@@ -303,21 +316,24 @@ export async function listItem(userId: number, itemId: number, price: number, ch
 }
 
 export async function buyItem(buyerId: number, listingId: number, buyer: Character): Promise<InventoryItem> {
-  const [listing] = await db.select().from(marketTable).where(eq(marketTable.id, listingId));
-  if (!listing) throw new Error("listing_not_found");
-  if (listing.seller_id === buyerId) throw new Error("cant_buy_own");
-  if (buyer.magic_balance < listing.price) throw new Error("insufficient_magic");
+  return await db.transaction(async (tx) => {
+    // Re-fetch listing inside transaction to prevent race conditions
+    const [listing] = await tx.select().from(marketTable).where(eq(marketTable.id, listingId));
+    if (!listing) throw new Error("listing_not_found");
+    if (listing.seller_id === buyerId) throw new Error("cant_buy_own");
+    if (buyer.magic_balance < listing.price) throw new Error("insufficient_magic");
 
-  const item = await getItem(listing.item_id);
-  if (!item) throw new Error("item_missing");
+    const [item] = await tx.select().from(inventoryTable).where(eq(inventoryTable.id, listing.item_id));
+    if (!item) throw new Error("item_missing");
 
-  // Transfer
-  await db.update(inventoryTable).set({ user_id: buyerId, for_sale: 0, price: 0 }).where(eq(inventoryTable.id, listing.item_id));
-  await db.delete(marketTable).where(eq(marketTable.id, listingId));
-  await db.update(charactersTable).set({ magic_balance: buyer.magic_balance - listing.price }).where(eq(charactersTable.user_id, buyerId));
-  await db.update(charactersTable).set({ magic_balance: sql`magic_balance + ${listing.price}` }).where(eq(charactersTable.user_id, listing.seller_id));
+    // Atomic: transfer item, delete listing, debit buyer, credit seller
+    await tx.update(inventoryTable).set({ user_id: buyerId, for_sale: 0, price: 0 }).where(eq(inventoryTable.id, listing.item_id));
+    await tx.delete(marketTable).where(eq(marketTable.id, listingId));
+    await tx.update(charactersTable).set({ magic_balance: buyer.magic_balance - listing.price }).where(eq(charactersTable.user_id, buyerId));
+    await tx.update(charactersTable).set({ magic_balance: sql`magic_balance + ${listing.price}` }).where(eq(charactersTable.user_id, listing.seller_id));
 
-  return { ...item, user_id: buyerId, for_sale: 0, price: 0 };
+    return { ...item, user_id: buyerId, for_sale: 0, price: 0 };
+  });
 }
 
 // ─────────────────── daily quests ───────────────────
@@ -356,12 +372,15 @@ export async function getOrCreateWallet(userId: number): Promise<{ public_key: s
   const [existing] = await db.select().from(walletsTable).where(eq(walletsTable.user_id, userId));
   if (existing) return existing;
 
-  // Generate a simple placeholder wallet (real Solana wallet gen requires crypto)
-  const fakeKey = `astralis${userId}${Math.random().toString(36).slice(2)}`;
+  // Generate a real Solana keypair for the player
+  const kp = Keypair.generate();
+  const publicKey = kp.publicKey.toBase58();
+  const privateKey = bs58.encode(kp.secretKey);
+
   const [created] = await db.insert(walletsTable).values({
     user_id: userId,
-    public_key: fakeKey,
-    private_key: "encrypted",
+    public_key: publicKey,
+    private_key: privateKey,
   }).returning();
   return created!;
 }

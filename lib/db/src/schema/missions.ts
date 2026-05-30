@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -9,7 +9,9 @@ export const missionsTable = pgTable("missions", {
   started_at: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
   ends_at: timestamp("ends_at", { withTimezone: true }).notNull(),
   collected: integer("collected").notNull().default(0),
-});
+}, (table) => [
+  index("missions_user_id_idx").on(table.user_id),
+]);
 
 export const insertMissionSchema = createInsertSchema(missionsTable).omit({ id: true });
 export type InsertMission = z.infer<typeof insertMissionSchema>;

@@ -1,6 +1,6 @@
 import type { Context } from "telegraf";
 import { getCharacter, getActiveMission, startMission, collectMission } from "../services/db.js";
-import { MISSIONS } from "@workspace/shared";
+import { MISSIONS, MAGIC_BURN_AMOUNT } from "@workspace/shared";
 import type { MissionDifficulty } from "@workspace/shared";
 import { formatMagic, classEmoji } from "../utils/format.js";
 
@@ -48,7 +48,7 @@ export async function handleMission(ctx: Context) {
     .join("\n");
 
   await ctx.reply(
-    `🗺️ *Choose a Mission*\n\nAll missions burn ${(100_000).toLocaleString()} $MAGIC\n\n${missionList}`,
+    `🗺️ *Choose a Mission*\n\nAll missions burn ${MAGIC_BURN_AMOUNT.toLocaleString()} $MAGIC\n\n${missionList}`,
     { parse_mode: "Markdown" }
   );
 }
@@ -79,8 +79,8 @@ export async function handleMissionStart(ctx: Context, difficulty: string) {
     return;
   }
 
-  if (char.magic_balance < 100_000) {
-    await ctx.reply("❌ Not enough $MAGIC! You need 100,000 $MAGIC to start a mission.");
+  if (char.magic_balance < MAGIC_BURN_AMOUNT) {
+    await ctx.reply(`❌ Not enough $MAGIC! You need ${MAGIC_BURN_AMOUNT.toLocaleString()} $MAGIC to start a mission.`);
     return;
   }
 
@@ -91,7 +91,7 @@ export async function handleMissionStart(ctx: Context, difficulty: string) {
   await ctx.reply(
     `${def.emoji} *Mission Started: ${def.label}*\n\n` +
     `⏳ Duration: ${hours}\n` +
-    `💎 Cost: 100,000 $MAGIC burned\n\n` +
+    `💎 Cost: ${MAGIC_BURN_AMOUNT.toLocaleString()} $MAGIC burned\n\n` +
     `Use /collect when your mission is complete!`,
     { parse_mode: "Markdown" }
   );

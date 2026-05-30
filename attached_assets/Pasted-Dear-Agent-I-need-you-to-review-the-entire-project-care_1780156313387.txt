@@ -1,0 +1,21 @@
+Dear Agent,
+I need you to review the entire project carefully, from top to bottom, and report back every issue you find. Please check each area one by one, in the order below, so nothing is missed.
+First, review the project setup. Confirm the folder structure, package configuration, environment variables, dependency list, startup scripts, and whether all apps are connected correctly.
+Next, inspect the bot entry point. Check the main launch file, bot initialization, middleware order, command registration, scene registration, error handling, and shutdown behavior.
+Then review the command system. Make sure every command works properly, including start, create character, stats, profile, inventory, mission, collect, upgrade, arena, battle, guild, market, buy, sell, daily, help, subscribe, unsubscribe, and burn report. Also check all invalid input handling and edge cases.
+After that, examine the game balance. Check class stats, class identities, rank progression, mission rewards, PvP rewards, item drop rates, upgrade scaling, stat growth, and the overall economy. Look for any class or mechanic that is too strong, too weak, or too easy to exploit.
+Then inspect the combat system. Review damage calculation, crit logic, defense mitigation, speed order, healing, battle end conditions, draw handling, RNG fairness, and whether any combat loops can break or hang.
+Please also check the mission and quest systems. Validate mission start rules, mission timing, collect logic, reward calculation, daily quest generation, quest resets, and duplicate claim protection.
+Review the inventory and item system next. Confirm item creation, rarity assignment, stat generation, slot assignment, upgrade costs, upgrade outcomes, sale listings, purchases, and inventory consistency.
+Then check the guild system. Review guild creation, joining, leaving, leadership, raids, raid damage tracking, raid rewards, guild XP, guild leveling, and membership edge cases.
+Please inspect the marketplace as well. Check listing creation, price validation, item ownership, purchase flow, market cleanup, duplicate listings, and item transfer correctness.
+Next, review the economy and burn system. Check burn split percentages, token accounting, reward pool handling, wallet transfers, decimals, inflation control, and whether the on-chain and off-chain values match correctly.
+Then audit the wallet and Solana integration. Check wallet creation, private key handling, encryption, public key validation, mint address usage, transaction confirmation, RPC configuration, retries, failover, and authorization for any token movement.
+Please also review the database layer. Check schema correctness, keys, defaults, indexes, transactions, concurrency, duplicate prevention, migration safety, backups, and whether SQLite is sufficient for the current load.
+After that, check security thoroughly. Look for hardcoded secrets, weak input validation, SQL injection risk, command injection risk, missing rate limits, missing authorization, unsafe wallet access, secret leakage in logs, and dependency vulnerabilities.
+Review the frontend and dashboard too. Check routing, layout structure, reusable components, API routes, loading states, error handling, responsiveness, formatting, and whether the dashboard data matches the backend.
+Also check the notifications and scheduler. Confirm cron timing, report generation, Telegram delivery, subscription handling, retries, timezone handling, and whether jobs still work after deployment or restart.
+Then inspect logging and monitoring. Make sure logs are readable, important events are tracked, sensitive data is excluded, and errors are easy to trace across bot, database, scheduler, and dashboard.
+Please check performance as well. Look for large files, repeated queries, blocking operations, heavy assets, slow endpoints, caching opportunities, and whether the system can scale beyond its current setup.
+After that, review deployment readiness. Confirm build commands, runtime commands, hosting config, environment variables, persistence, cold starts, logs, and rollback safety.
+Finally, check the documentation. Make sure setup instructions, command lists, API docs, deployment notes, troubleshooting guides, and environment variable instructions all match the actual code

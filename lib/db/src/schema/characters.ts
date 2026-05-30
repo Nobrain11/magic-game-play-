@@ -1,4 +1,4 @@
-import { pgTable, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, integer, text, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -27,7 +27,10 @@ export const charactersTable = pgTable("characters", {
   daily_date: text("daily_date"),
   magic_balance: integer("magic_balance").notNull().default(0),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("characters_guild_id_idx").on(table.guild_id),
+  index("characters_rank_idx").on(table.rank),
+]);
 
 export const insertCharacterSchema = createInsertSchema(charactersTable).omit({ created_at: true });
 export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
