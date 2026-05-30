@@ -44,7 +44,7 @@ export const Guilds = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-52 rounded-lg" style={{ background: "#141927" }} />
           ))}
@@ -55,7 +55,7 @@ export const Guilds = () => {
           No guilds founded yet
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {(data?.guilds ?? []).map((guild) => {
             const g = guild as GuildRow;
             const tag = g.tag ?? guildTag(g.name);

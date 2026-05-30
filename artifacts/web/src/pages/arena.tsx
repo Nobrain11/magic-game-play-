@@ -46,7 +46,8 @@ export const Arena = () => {
         className="rounded-lg overflow-hidden"
         style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[520px]">
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               {["ATTACKER", "VS", "DEFENDER", "WINNER", "MAGIC WON", "TIME"].map((h) => (
@@ -135,6 +136,7 @@ export const Arena = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

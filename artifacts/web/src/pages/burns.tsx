@@ -59,7 +59,7 @@ export const Burns = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <StatCard
           label="Total Burned"
           value={reportLoading ? "—" : formatNumber(report?.total_burned ?? 0)}
@@ -80,7 +80,7 @@ export const Burns = () => {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <StatCard
           label="Reward Pool"
           value={reportLoading ? "—" : formatNumber(report?.total_to_rewards ?? 0)}
@@ -113,7 +113,8 @@ export const Burns = () => {
           className="rounded-lg overflow-hidden"
           style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
         >
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px]">
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 {["TRIGGER", "AMOUNT", "TREASURY", "REWARD POOL", "PLAYER", "TIME"].map((h) => (
@@ -189,6 +190,7 @@ export const Burns = () => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

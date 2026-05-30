@@ -98,7 +98,8 @@ export const Missions = () => {
         className="rounded-lg overflow-hidden"
         style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px]">
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               {["MISSION", "DIFFICULTY", "STATUS", "PLAYER", "TIME"].map((h) => (
@@ -176,6 +177,7 @@ export const Missions = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -93,7 +93,8 @@ export const Leaderboard = () => {
         className="rounded-lg overflow-hidden"
         style={{ background: "#141927", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px]">
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               {["#", "PLAYER", "LEVEL", "XP", "WINS", "DAMAGE", "RANK"].map((h) => (
@@ -172,6 +173,7 @@ export const Leaderboard = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

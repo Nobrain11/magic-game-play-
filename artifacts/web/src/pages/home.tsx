@@ -140,7 +140,7 @@ export const Home = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           label="Total Players"
           value={statsLoading ? "—" : formatNumber(stats?.total_players ?? 0)}
@@ -167,7 +167,7 @@ export const Home = () => {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="Active (24H)"
           value={statsLoading ? "—" : stats?.active_24h ?? 0}
@@ -193,7 +193,7 @@ export const Home = () => {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <FeedPanel
           title="Recent Battles"
           icon={Swords}

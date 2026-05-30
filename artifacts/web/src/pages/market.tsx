@@ -62,7 +62,7 @@ export const Market = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
               <Skeleton
@@ -73,7 +73,7 @@ export const Market = () => {
             ))
           : (data?.listings ?? []).length === 0
           ? (
-            <div className="col-span-3 py-16 text-center text-sm" style={{ color: "#6b7280" }}>
+            <div className="col-span-full py-16 text-center text-sm" style={{ color: "#6b7280" }}>
               <ShoppingBag className="w-10 h-10 mx-auto mb-3 opacity-20" />
               No listings found
             </div>
